@@ -1,0 +1,16 @@
+cd demo_app/
+
+python3 -m venv env 
+source env/bin/activate
+
+
+Set up your google cloud project name
+gcloud config set project VALUE
+
+example: 
+gcloud config set project data-science-gcp-324204
+
+pip install -r requirements.txt
+
+gcloud app deploy
+gcloud app browse

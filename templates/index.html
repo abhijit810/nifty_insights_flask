@@ -1,0 +1,140 @@
+<!doctype html>
+<!--
+ Copyright 2021 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+<head>
+  <title>Nifty insights</title>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <!-- bootstrap script source -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h1>Nifty data</h1>
+
+  <h2>Last 5 days</h2>
+  <!-- {% for header in headers %}
+    <p>{{ header }}</p>
+  {% endfor %} -->
+
+  <table class="table">
+      <tr class="table__header">
+            {% for header in headers %}
+            <th class="table__cell">
+                {{ header }}
+            </th>
+            {% endfor %}
+      </tr>
+      {% for row in data %}
+      <tr class="table__row">
+        {% for cell in row %}
+        <td class="table__cell">
+            {{ cell }}
+        </td>
+      {% endfor %}  
+      </tr>
+      {% endfor %}
+  </table>
+
+  <h2>Days when Market was volatile</h2>
+  <!-- {% for header in headers %}
+    <p>{{ header }}</p>
+  {% endfor %} -->
+
+  <table class="table">
+      <tr class="table__header">
+            {% for header in headers %}
+            <th class="table__cell">
+                {{ header }}
+            </th>
+            {% endfor %}
+      </tr>
+      {% for row in volatile %}
+      <tr class="table__row">
+        {% for cell in row %}
+        <td class="table__cell">
+            {{ cell }}
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+  </table>
+
+  <h2>A few insights</h2>
+  <!-- {% for header in headers %}
+    <p>{{ header }}</p>
+  {% endfor %} -->
+
+  <table class="table">
+      {% for row in insights %}
+      <tr class="table__row">
+        {% for cell in row %}
+        <td class="table__cell">
+            {{ cell }}
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+  </table>
+
+  <canvas id = "thisYear", width="900", height="600"></canvas>
+  <canvas id = "rollingSum", width="900", height="600"></canvas>
+  <script>
+      var thisYear_ctx = document.getElementById("thisYear").getContext("2d")
+      var lineChart = new Chart(thisYear_ctx, {
+          type: "line",
+          data: {
+              labels: {{ labels | safe }},
+              datasets: [{
+                      label:"Price",
+                      data: {{ values | safe }},
+                      fill: true,
+                      borderColor: "rgb(32, 150, 80)",
+                      lineTension: 0.5
+                        }]
+          },
+          options:{
+              responsive : true
+            }
+      });
+
+      var rollingSum_ctx = document.getElementById("rollingSum").getContext("2d")
+      var lineChart = new Chart(rollingSum_ctx, {
+          type: "line",
+          data: {
+              labels: {{ labels | safe }},
+              datasets: [{
+                      label:"Rolling Price",
+                      data: {{ rolling | safe }},
+                      fill: true,
+                      borderColor: "rgb(32, 150, 80)",
+                      lineTension: 0.5
+                        }]
+          },
+          options:{
+              responsive : true
+            }
+      });
+  </script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
