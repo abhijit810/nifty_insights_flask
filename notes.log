@@ -14,3 +14,9 @@ pip install -r requirements.txt
 
 gcloud app deploy
 gcloud app browse
+
+
+git init
+git add .
+git commit -m "initial commit"
+git remote add origin https://github.com/abhijit810/nifty_insights_flask
