@@ -92,45 +92,217 @@
       </tr>
       {% endfor %}
   </table>
-
-  <canvas id = "thisYear", width="900", height="600"></canvas>
-  <canvas id = "rollingSum", width="900", height="600"></canvas>
+<div> <canvas id = "thisYear", width="1500", height="550"> </canvas> </div>
+<div>  <canvas id = "rollingSum", width="1500", height="550"></canvas> </div>
   <script>
       var thisYear_ctx = document.getElementById("thisYear").getContext("2d")
-      var lineChart = new Chart(thisYear_ctx, {
-          type: "line",
-          data: {
-              labels: {{ labels | safe }},
-              datasets: [{
-                      label:"Price",
-                      data: {{ values | safe }},
-                      fill: true,
-                      borderColor: "rgb(32, 150, 80)",
-                      lineTension: 0.5
-                        }]
-          },
-          options:{
-              responsive : true
-            }
-      });
-
       var rollingSum_ctx = document.getElementById("rollingSum").getContext("2d")
-      var lineChart = new Chart(rollingSum_ctx, {
-          type: "line",
-          data: {
-              labels: {{ labels | safe }},
-              datasets: [{
-                      label:"Rolling Price",
-                      data: {{ rolling | safe }},
-                      fill: true,
-                      borderColor: "rgb(32, 150, 80)",
-                      lineTension: 0.5
-                        }]
-          },
-          options:{
-              responsive : true
-            }
-      });
+      const regular_config = {
+  // The type of chart we want to create
+  type: 'line', //types: bar, horizontalBar, pie, line, doughnut, radar, polarArea
+
+  // The data for our dataset
+  data: {
+    labels: {{ labels | safe }},
+    datasets: [{
+      label: 'Prices this year',
+      backgroundColor: 'rgba(255, 99, 132, 0)',
+      borderColor: 'rgb(117, 4, 28)',
+      borderWidth: 1,
+      hoverBorderWidth: 3,
+      hoverBorderColor: '#000',
+      data: {{ values | safe }},
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Past one year',
+      fontSize: 25,
+    },
+    legend: {
+      //display:false //to hide legend
+      position: 'right',
+      labels: {
+        fontColor: '#000'
+      }
+    },
+    tooltips: {
+      //enabled:false,
+    },
+    scales: {
+      yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: 'Price',
+          fontColor: '#000',
+          fontWeight: 'bold',
+          fontSize: 25
+        }
+      }],
+      xAxes: [{
+        type: 'time',
+        time: {
+          parser: 'dd-mm-YYYY', //these formatting values do nothing, I've tried a few different ones
+          //unit: 'week', //I have tried minutes and hours too, same result
+          displayFormats: {
+                                        'millisecond': 'SSS [ms]',
+                                        'second': 'h:mm:ss a', // 11:20:01 AM
+                                        'minute': 'h:mm:ss a', // 11:20:01 AM
+                                        'hour': 'MMM D, hA', // Sept 4, 5PM
+                                        'day': 'MMM Do', // Sep 4 2015
+                                        'week': 'll', // Week 46, or maybe "[W]WW - YYYY" ?
+                                        'month': 'MMM YYYY', // Sept 2015
+                                        'quarter': '[Q]Q - YYYY', // Q3
+                                        'year': 'YYYY', // 2015
+          }
+        },
+        ticks: {
+          source: 'auto'
+        },
+        scaleLabel: {
+          display: true,
+          labelString: 'Recording Time',
+          fontColor: '#000',
+          fontWeight: 'bold',
+          fontSize: 25
+        }
+      }]
+    },
+    responsive: false,
+    maintainAspectRatio: false,
+    elements: {
+      point: {
+        radius: 0
+      },
+      line: {
+        tension: 0
+      }
+    },
+  }
+
+};
+    //var lineChart = new Chart(thisYear_ctx,config)
+    new Chart(thisYear_ctx, regular_config);
+    //   var lineChart = new Chart(thisYear_ctx, {
+    //       type: "line",
+    //       data: {
+    //           labels: {{ labels | safe }},
+    //           datasets: [{
+    //                   label:"Price",
+    //                   data: {{ values | safe }},
+    //                   fill: true,
+    //                   borderColor: "rgb(32, 150, 80)",
+    //                   lineTension: 0.5
+    //                     }]
+    //       },
+    //       options:{
+    //           responsive : false
+    //         }
+    //   });
+
+    //   var rollingSum_ctx = document.getElementById("rollingSum").getContext("2d")
+    //   var lineChart = new Chart(rollingSum_ctx, {
+    //       type: "line",
+    //       data: {
+    //           labels: {{ labels | safe }},
+    //           datasets: [{label:"Monthly Rolling Price", 
+    //                         data: {{ rolling | safe }}, 
+    //                         fill: true, 
+    //                         borderColor: "rgb(32, 150, 80)", 
+    //                         lineTension: 0.5 }]
+    //             },
+    //             options:{
+    //                 responsive : false
+    //                     }
+    //                     });
+const rolling_config = {
+  // The type of chart we want to create
+  type: 'line', //types: bar, horizontalBar, pie, line, doughnut, radar, polarArea
+
+  // The data for our dataset
+  data: {
+    //labels: [new Date('2019-12-19T13:36:29-08:00'), new Date('2019-12-19T13:36:59-08:00'), new Date('2019-12-19T13:37:29-08:00'), new Date('2019-12-19T13:37:59-08:00'), new Date('2019-12-19T13:38:29-08:00')],
+    labels: {{ labels | safe }},
+    datasets: [{
+      label: '30 days rolling mean',
+      backgroundColor: 'rgba(32, 150, 80, 0)',
+      borderColor: 'rgb(35, 120, 90)',
+      borderWidth: 1,
+      hoverBorderWidth: 5,
+      hoverBorderColor: '#000',
+      data: {{ rolling | safe }},
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Past one year',
+      fontSize: 25,
+    },
+    legend: {
+      //display:true //to hide legend
+      position: 'right',
+      labels: {
+        fontColor: '#000'
+      }
+    },
+    tooltips: {
+      //enabled:false,
+    },
+    scales: {
+      yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: 'Price',
+          fontColor: '#000',
+          fontWeight: 'bold',
+          fontSize: 25
+        }
+      }],
+      xAxes: [{
+        type: 'time',
+        time: {
+          parser: 'dd-mm-YYYY', //these formatting values do nothing, I've tried a few different ones
+          unit: 'week', //I have tried minutes and hours too, same result
+          displayFormats: {
+                                        'millisecond': 'SSS [ms]',
+                                        'second': 'h:mm:ss a', // 11:20:01 AM
+                                        'minute': 'h:mm:ss a', // 11:20:01 AM
+                                        'hour': 'MMM D, hA', // Sept 4, 5PM
+                                        'day': 'MMM Do', // Sep 4 2015
+                                        'week': 'll', // Week 46, or maybe "[W]WW - YYYY" ?
+                                        'month': 'MMM YYYY', // Sept 2015
+                                        'quarter': '[Q]Q - YYYY', // Q3
+                                        'year': 'YYYY', // 2015
+          }
+        },
+        ticks: {
+          source: 'auto'
+        },
+        scaleLabel: {
+          display: true,
+          labelString: 'Dates',
+          fontColor: '#000',
+          fontWeight: 'bold',
+          fontSize: 25
+        }
+      }]
+    },
+    responsive: false,
+    maintainAspectRatio: false,
+    elements: {
+      point: {
+        radius: 0
+      },
+      line: {
+        tension: 0
+      }
+    },
+  }
+
+};
+new Chart(rollingSum_ctx, rolling_config);
   </script>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
