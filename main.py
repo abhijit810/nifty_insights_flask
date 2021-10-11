@@ -7,8 +7,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def root():
-
-    nifty = pd.read_csv("data.csv")
+    pd.options.display.float_format = '${:,.2f}'.format
+    nifty = pd.read_csv("data.csv", index_col =0)
     nifty[nifty['High'] > (nifty['Low'] * 1.03 )]
 
     column_names = tuple(nifty.columns)
@@ -21,7 +21,10 @@ def root():
     insights = nifty[nifty.index.weekday.isin([0,1,2,3,4])]['Close'].describe()
 
     insights_index = insights.index.tolist()
-    insights_values = insights.values.tolist()
+    
+    make_float = lambda x: "{:,.2f}".format(x)
+    # insights_values = insights.values.tolist()
+    insights_values = [str(a) for a in insights.apply(make_float)]
 
     #graph_index = nifty.index.tolist()
     #graph_data = nifty["High"].values.tolist()
@@ -30,7 +33,7 @@ def root():
 
     monthly_rolling = nifty['Close'].rolling('30d').mean().values.tolist()
     
-    indexes = [date_obj.strftime('%d.%m.%y') for date_obj in open.index.tolist()]
+    indexes = [date_obj.strftime("%d-%m-%Y") for date_obj in open.index.tolist()]
 
     return render_template('index.html', data=nifty_list, 
                                          headers=column_names, 
