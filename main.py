@@ -2,6 +2,8 @@ import datetime
 
 from flask import Flask, render_template
 import pandas as pd
+import gcsfs
+
 app = Flask(__name__)
 
 
@@ -9,12 +11,17 @@ app = Flask(__name__)
 def root():
     pd.options.display.float_format = '${:,.2f}'.format
     nifty = pd.read_csv("data.csv", index_col =0)
+    
+    fs = gcsfs.GCSFileSystem(project='data-science-gcp-324204')
+    with fs.open('nifty-data-bucket/data.csv') as f:
+        nifty = pd.read_csv(f)
+    
     nifty[nifty['High'] > (nifty['Low'] * 1.03 )]
 
     column_names = tuple(nifty.columns)
     nifty_list = [[i for i in x if pd.notnull(i)] for x in nifty.tail().values.tolist()]
     
-    nifty.index = pd.to_datetime(nifty.index)
+    nifty.index = pd.to_datetime(nifty["Date"])
     volatile_df = nifty[nifty['High'] >= (nifty['Low'] * 1.04 )]
     volatile_list = [[i for i in x if pd.notnull(i)] for x in volatile_df.values.tolist()]
 
@@ -34,6 +41,7 @@ def root():
     monthly_rolling = nifty['Close'].rolling('30d').mean().values.tolist()
     
     indexes = [date_obj.strftime("%d-%m-%Y") for date_obj in open.index.tolist()]
+
 
     return render_template('index.html', data=nifty_list, 
                                          headers=column_names, 
