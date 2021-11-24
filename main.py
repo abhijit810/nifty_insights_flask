@@ -11,11 +11,6 @@ app = Flask(__name__)
 def root():
     pd.options.display.float_format = '${:,.2f}'.format
     nifty = pd.read_csv("data.csv", index_col =0)
-    
-    fs = gcsfs.GCSFileSystem(project='data-science-gcp-324204')
-    with fs.open('nifty-data-bucket/data.csv') as f:
-        nifty = pd.read_csv(f)
-    
     nifty[nifty['High'] > (nifty['Low'] * 1.03 )]
 
     column_names = tuple(nifty.columns)
